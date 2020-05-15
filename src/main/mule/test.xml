@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ee1bf623-32c5-4deb-9cd0-566d61afd059" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="04c26ff4-400b-40c4-9ba6-2d61d153531c" >
+		<http:request-connection host="sandbox-quickbooks.api.intuit.com" protocol="HTTPS"/>
+	</http:request-config>
+	<flow name="testFlow" doc:id="587ce534-64c1-4085-a1e6-074f43741f1f" initialState="stopped">
+		<http:listener doc:name="Listener" doc:id="17682728-1148-49c7-ae5e-ffe3b6e5d7ba" config-ref="HTTP_Listener_config" path="/invoice/{id}"/>
+		<set-variable value="#[attributes.uriParams.id]" doc:name="Set Variable" doc:id="4f1c9bd4-30ae-4ee3-8091-01e4c84fb3ab" variableName="id"/>
+		<http:request method="GET" doc:name="Request" doc:id="91cf3b9f-d1fb-4aaa-a105-b539abbbfe66" config-ref="HTTP_Request_configuration" path="/v3/company/4620816365015366750/query?query=select * from Invoice where id ='{id}'&amp;minorversion=47">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..ncTRSwL8gxBczeB5LNoEFA.PioGxmh6bUoSQE_z4oAZ502kWBZUzRTHOSAfK3Uld3HvGLhvrht6z6_4XBIylJzy8B4mzK6HBt90j4ULHzpuwnCTvROG2wFCGNqTfjuk6ivSv3lX_h51p1Y8aoVeBWBhnU6Ecnd26htvnMFhTQ1FaMkyDH40OGjKLZuKV5pEmrMYWaQsE60YGCQdVzQW2K411V5v4tFMfklUaPyk9qAyT8cKkFBFye2H9lPmIZPuou1oRKDL5mjZQSTO7dxwCPmFl7UXi46hcr8YpG-jz2SNjHfRUrkBQcjXwr9RizZ8nawBRxFYme6r5C1P-4LUnlVXrSmXll75ZDR9fSPrBJ-joMaSZW5C19Se2f0NyYaY56CfSjHWqKtlcWO4mToQKVF17ffyo4rtNLYcvgNFGTvllXEJElL4kaLIKJmAlN2w9p-fECbcsWKbzkfrcpFKYX-onsCz6LRKY7qgY9lGVFXa129nbLnqKfn05Tr73VN_lt8a91KVivUaFSg2qy-zsSxxF8tAbrMRlLPYyE6akMl8zAcn-bT_sTibOTvw3vNt8ivf7WAle1mZWIDYoiMk1VFsLyl7HnsgYKXvkhQiu1Cid6W8B2DFQ9A-qXYIsADcTQGHAf7lYFZOcUTiuBDX7uH8at5rLSuK_HeSYhewATUqBbpUhC0_AEFNeaqmuKxbFSNXdrmD7maTSkSpl4ZhC9Xm64PDRCXOB2HpELGABQP4lFisNTMdtNmgt1mspV4jjxpE35tc_-ltGW2MF7oMw6TL-aYZtcD3xYckB1-MydGkocifznTv1jrLEn1vsxn34UYqHy_Lq4q9kHAzye-gki6Ze8am8Y3gdJVP006k2xURxK4CytWZwZoiaMANMssmIvsoyg1o8NR1ybUaRjnimv2C-kRC6_9wvxA0gM6GjiNSwg.ANGB0H2A9krWjQeKHSFCyw"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"id" : vars.id
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="a7df2ddd-e45b-4b6c-9cad-7898c6f01de0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="testFlow1" doc:id="50b6498e-46ed-40f5-af7b-d4f365b831c2" >
+		<http:listener doc:name="Listener" doc:id="ebcd46df-f155-4bf9-af3a-69aed898b332" config-ref="HTTP_Listener_config" path="/test1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="90a15999-e558-4391-b291-4cad0163ad89" message="Hi payload is #[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="53671364-5631-4d6b-9bdd-f0cfd7bdd272" message="Processing completed !!"/>
+	</flow>
+</mule>
